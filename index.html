@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopt Your Cat!</title>
+    <link rel="shortcut icon" href="logo.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link rel="stylesheet" href="css/tooplate-antique-cafe.css">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cormorant Garamond', serif !important;
+            font-weight: 700;
+        }
+
+        /* nama img/kucing hitam */
+        .cat-name-black {
+            color: #1a1a1a !important;
+            font-family: 'Cormorant Garamond', serif !important;
+        }
+
+        .cat-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+            flex-shrink: 0;
+        }
+
+        /* warna kotak cats diganti hijau tua */
+        .tm-bg-brown {
+            background-color: #1e3a2f !important;
+        }
+
+        /* MODAL */
+        .cat-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .cat-modal-overlay.active { display: flex; }
+        .cat-modal-box {
+            background: #1e3a2f;
+            border-radius: 1rem;
+            max-width: 750px;
+            width: 90%;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @media (min-width: 640px) {
+            .cat-modal-box { flex-direction: row; }
+        }
+        .cat-modal-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        .cat-modal-img {
+            width: 100%;
+            max-width: 220px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            margin: 0 auto;
+        }
+        @media (min-width: 640px) {
+            .cat-modal-img { width: 220px; margin: 0; }
+        }
+        .btn-ask-cat {
+            width: 100%;
+            max-width: 220px;
+            background: #f0c040;
+            color: #1e3a2f;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            letter-spacing: 0.03em;
+        }
+        .btn-ask-cat:hover { background: #fff; color: #1e3a2f; }
+
+        .cat-modal-info { flex: 1; color: white; }
+        .cat-modal-info h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #f0c040;
+            font-family: 'Cormorant Garamond', serif !important;
+        }
+        .cat-modal-info .cat-detail {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: #a8c5b0;
+            font-family: 'Nunito', sans-serif;
+        }
+        .cat-modal-info .cat-bio {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #d4ead9;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 1rem;
+            font-family: 'Nunito', sans-serif;
+        }
+        .cat-modal-close {
+            position: absolute;
+            top: 0.75rem; right: 1rem;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+        .cat-modal-close:hover { color: #f0c040; }
+
+        .btn-know-more {
+            margin-top: 0.75rem;
+            background: transparent;
+            border: 1.5px solid #1a1a1a;
+            color: #1a1a1a;
+            padding: 0.35rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .btn-know-more:hover { background: #1a1a1a; color: #f0c040; }
+
+        /* BUBBLE */
+        .wa-bubble {
+            display: none;
+            background: #f0c040;
+            color: #1e3a2f;
+            border-radius: 1rem 1rem 0 1rem;
+            padding: 0.75rem 1.2rem;
+            margin-bottom: 1rem;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            max-width: 90%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .wa-bubble.visible { display: block; }
+
+        /* CONTACT FORM */
+        .contact-label {
+            display: block;
+            color: #f0c040;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.04em;
+        }
+        .contact-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid #f0c040;
+            color: white;
+            padding: 0.75rem 0;
+            margin-bottom: 1.5rem;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .contact-input::placeholder { color: rgba(255,255,255,0.4); }
+        .contact-input:focus { border-bottom-color: white; }
+        .contact-textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid #f0c040;
+            color: white;
+            padding: 0.75rem 0;
+            margin-bottom: 1.5rem;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+            resize: none;
+            transition: border-color 0.2s;
+        }
+        .contact-textarea::placeholder { color: rgba(255,255,255,0.4); }
+        .contact-textarea:focus { border-bottom-color: white; }
+        .btn-send {
+            background: #f0c040;
+            color: #1e3a2f;
+            border: none;
+            padding: 0.85rem 2.5rem;
+            border-radius: 0.5rem;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-send:hover { background: white; color: #1e3a2f; }
+
+        /* CONTACT INFO */
+        .contact-info-label {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #888;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .contact-info-value {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2d2d2d;
+            margin-bottom: 1.5rem;
+            margin-top: 0.3rem;
+        }
+        .contact-info-value a { color: #2d7d46; transition: color 0.2s; }
+        .contact-info-value a:hover { color: #f0c040; }
+
+        /* Maps button besar */
+        .btn-maps-big {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: #2d7d46;
+            color: white;
+            border-radius: 0.75rem;
+            padding: 1.4rem 1rem;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            transition: background 0.2s;
+            margin-top: 1.5rem;
+            text-decoration: none;
+        }
+        .btn-maps-big:hover { background: #1e3a2f; color: #f0c040; }
+        .btn-maps-big i { font-size: 1.6rem; margin-right: 0.75rem; }
+    </style>
+</head>
+<body>
+    <!-- Intro -->
+    <div id="intro" class="parallax-window" data-parallax="scroll" data-image-src="img/bg1.gif">
+        <nav id="tm-nav" class="fixed w-full">
+            <div class="tm-container mx-auto px-2 md:py-6 text-right">
+                <button class="md:hidden py-2 px-2" id="menu-toggle"><i class="fas fa-2x fa-bars tm-text-gold"></i></button>
+                <ul class="mb-3 md:mb-0 text-2xl font-normal flex justify-end flex-col md:flex-row" style="font-family:'Nunito',sans-serif;">
+                    <li class="inline-block mb-4 mx-4"><a href="#intro" class="tm-text-gold py-1 md:py-3 px-4">Home</a></li>
+                    <li class="inline-block mb-4 mx-4"><a href="#menu" class="tm-text-gold py-1 md:py-3 px-4">Cats</a></li>
+                    <li class="inline-block mb-4 mx-4"><a href="#about" class="tm-text-gold py-1 md:py-3 px-4">About</a></li>
+                    <li class="inline-block mb-4 mx-4"><a href="#contact" class="tm-text-gold py-1 md:py-3 px-4">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container mx-auto px-2" style="max-width: 780px;">
+            <div class="sm:pb-60 sm:pt-48 py-20">
+                <div class="bg-black bg-opacity-70 p-12 mb-5 text-center" style="border-radius:1rem;">
+                    <h1 class="text-white tm-logo-font mb-5" style="font-size:3.4rem; letter-spacing:0.05em; line-height:1.2; font-family:'Cormorant Garamond',serif !important;">🐾 Adopt Your Cat! 🐾</h1>
+                    <p class="tm-text-gold" style="font-size:1.25rem; font-family:'Nunito',sans-serif; font-weight:500; letter-spacing:0.04em;">Choose and adopt the cat you want</p>
+                </div>
+                <div class="bg-black bg-opacity-70 p-10 mb-5" style="border-radius:1rem;">
+                    <p class="text-white leading-8" style="font-size:1rem; font-family:'Nunito',sans-serif; font-weight:300;">
+                        This is a cat boarding place run by Kalila Naomi, a student of MAN 1 Yogyakarta.
+                        If you're interested in one of our cats, don't hesitate to
+                        <a rel="nofollow" href="https://wa.me/+628888650603" target="_parent" style="color:#f0c040; text-decoration:underline;">send us a message</a>
+                        so you can take it home!
+                    </p>
+                </div>
+                <div class="text-center">
+                    <a href="#menu" class="inline-flex justify-center items-center bg-black bg-opacity-70 py-5 px-10 rounded-lg tm-text-gold hover:text-gray-200 transition" style="font-size:1.2rem; font-family:'Nunito',sans-serif; font-weight:700; letter-spacing:0.05em;">
+                        <i class="fas fa-cat mr-3"></i>
+                        <span>Look at my cat</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Our Various Cats 1 -->
+    <div id="menu" class="parallax-window" data-parallax="scroll" data-image-src="img/bg2.gif">
+        <div class="container mx-auto tm-container py-24 sm:py-48">
+            <div class="text-center mb-16">
+                <h2 class="bg-white tm-text-brown py-6 px-12 text-4xl font-medium inline-block rounded-md">Our Various Cats</h2>
+            </div>
+            <div class="flex flex-col lg:flex-row justify-around items-center">
+                <div class="flex-1 m-5 rounded-xl px-4 py-6 sm:px-8 sm:py-10 tm-bg-brown tm-item-container">
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucing1.gif" class="cat-img" alt="Mia">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Mia</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Female</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 5 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Mia','img./img/kucing1.gif','Female','5 Months','Mia is the loud tiny diva of the shelter. She meows like she\'s arguing with the world 24/7 and always wants attention immediately. If you ignore her for even five seconds, she will stare dramatically until you notice her again.')">Get to know more</button>
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucing2.gif" class="cat-img" alt="Blobli & Bloblo">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Blobli & Bloblo</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 3 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Blobli &amp; Bloblo','img/kucing2.gif','Male','3 Months','Blobli and Bloblo are the chaotic duo nobody can separate. One of them always starts trouble, and the other immediately joins without asking questions. They love chasing each other around, making weird noises, and acting like tiny fluffy comedians.')">Get to know more</button>
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucing3.gif" class="cat-img" alt="Chimi">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Chimi</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 2 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Chimi','img/kucing3.gif','Male','2 Months','Chimi is the tiny baby prince of the shelter. He looks innocent and adorable, but secretly loves biting fingers and attacking moving blankets. He enjoys cuddling for five minutes before suddenly turning into a hyper little gremlin.')">Get to know more</button>
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucing4.gif" class="cat-img" alt="Pushy">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl cat-name-black mb-1">Pushy</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 2 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Pushy','img/kucing4.gif','Male','2 Months','Pushy is the tiny chaos machine of the shelter. He looks cute for two seconds before suddenly screaming at invisible enemies and running around like he drank five cups of coffee. He loves attacking random objects and starting drama for absolutely no reason.')">Get to know more</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 m-5 rounded-xl px-4 py-6 sm:px-8 sm:py-10 tm-bg-brown tm-item-container">
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Mimmo</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 8 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Mimmo','img/kucing5.gif','Male','8 Months','Mimmo acts like a hardworking employee who is tired of life. He walks around calmly like he\'s finishing a long shift at work and gives everyone a serious stare. But once snacks appear, his professional attitude disappears immediately.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucing5.gif" class="cat-img" alt="Mimmo">
+                    </div>
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Rocky</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 12 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Rocky','img/kucing6.gif','Male','12 Months','Rocky is the sleepy uncle of the shelter. He loves warm places, long naps, and pretending he didn\'t hear anyone calling him. He moves slowly, looks permanently tired, but secretly enjoys sitting beside people quietly.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucing6.gif" class="cat-img" alt="Rocky">
+                    </div>
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Dongdong</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 12 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Dongdong','img/kucing7.gif','Male','12 Months','Dongdong always looks confused for absolutely no reason. His face makes it seem like he just woke up from the weirdest dream ever. He enjoys staring into space, sitting in random places, and acting clueless even when he caused the chaos himself.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucing7.gif" class="cat-img" alt="Dongdong">
+                    </div>
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl cat-name-black mb-1">Jeje</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 8 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Jeje','img/kucing8.gif','Male','8 Months','Jeje is the goofy gentleman of the group. His face always looks like he just heard the funniest joke ever. He enjoys getting close to people, staring awkwardly at cameras, and acting silly without even trying. Everyone somehow ends up laughing because of him.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucing8.gif" class="cat-img" alt="Jeje">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Our Various Cats 2 -->
+    <div class="parallax-window" data-parallax="scroll" data-image-src="img/bg2.gif">
+        <div class="container mx-auto tm-container py-24 sm:py-48">
+            <div class="text-center mb-16">
+                <h2 class="bg-white tm-text-brown py-6 px-12 text-4xl font-medium inline-block rounded-md">Our Various Cats</h2>
+            </div>
+            <div class="flex flex-col lg:flex-row justify-around items-center">
+                <div class="flex-1 m-5 rounded-xl px-4 py-6 sm:px-8 sm:py-10 tm-bg-brown tm-item-container">
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucingktk1.gif" class="cat-img" alt="Beible">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Beible</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 6 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Beible','img/kucingktk1.gif','Male','6 Months','Beible is the professional side-eye master of the shelter. His face always looks like he\'s silently roasting everyone around him. He enjoys sitting in corners, watching people with his judging stare, and acting like he\'s too cool to care. But secretly, he likes attention and soft pets when nobody notices.')">Get to know more</button>
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucingktk2.gif" class="cat-img" alt="Dacduc">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Dacduc</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Female</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 5 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Dacduc','img/kucingktk2.gif','Female','5 Months','Dacduc is the chaotic little sunshine. She gets excited over literally everything — food, toys, shadows, or even moving feet. She loves zooming around the room at midnight and then suddenly falling asleep in the weirdest positions.')">Get to know more</button>
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucingktk3.gif" class="cat-img" alt="Seyyo">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Seyyo</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 5 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Seyyo','img/kucingktk3.gif','Male','5 Months','Seyyo is the curious baby of the group. He always wants to know what everyone is doing and will follow you everywhere like a tiny bodyguard. He enjoys stealing small objects, staring out the window, and demanding attention at the most random times.')">Get to know more</button>
+                        </div>
+                    </div>
+                    <div class="flex items-start mb-6 tm-menu-item">
+                        <img src="img/kucingktk4.gif" class="cat-img" alt="Chikky">
+                        <div class="ml-3 sm:ml-6">
+                            <h3 class="text-xl sm:text-2xl cat-name-black mb-1">Chikky</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 6 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Chikky','img/kucingktk4.gif','Male','6 Months','Chikky is the snack addict of the shelter. He acts innocent, but the moment he hears food packaging, he suddenly appears out of nowhere. He loves staring at people while they eat like he\'s being personally betrayed for not getting a bite. His blank face somehow makes everything funnier.')">Get to know more</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 m-5 rounded-xl px-4 py-6 sm:px-8 sm:py-10 tm-bg-brown tm-item-container">
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Heyho</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 7 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Heyho','img/kucingktk5.gif','Male','7 Months','Heyho is loud, dramatic, and full of personality. He talks a lot, especially when he wants snacks or cuddles. Even though he acts super confident, he actually gets clingy when nobody is around. His meows sound like tiny complaints 24/7.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucingktk5.gif" class="cat-img" alt="Heyho">
+                    </div>
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Billy</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 7 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Billy','img/kucingktk6.gif','Male','7 Months','Billy is the funniest cat in the shelter. He makes the weirdest faces for no reason and somehow turns everything into comedy. He loves snacks more than anything and will magically appear whenever he hears food packaging.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucingktk6.gif" class="cat-img" alt="Billy">
+                    </div>
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl mb-2 sm:mb-3 cat-name-black">Kicchi</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Female</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 2 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Kicchi','img/kucingktk7.gif','Female','2 Months','Kicchi is the tiny energetic princess. She may be small, but she runs faster than everyone and loves climbing onto beds, chairs, and people. She gets playful very easily and enjoys attacking shoelaces like they are her biggest enemy.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucingktk7.gif" class="cat-img" alt="Kicchi">
+                    </div>
+                    <div class="flex items-start justify-end mb-6 tm-menu-item-2">
+                        <div class="text-right mr-6">
+                            <h3 class="text-xl sm:text-2xl cat-name-black mb-1">Marky</h3>
+                            <div class="text-white text-lg sm:text-xl font-light mb-1" style="font-family:'Nunito',sans-serif;">Gender : Male</div>
+                            <div class="text-white text-lg sm:text-xl font-light" style="font-family:'Nunito',sans-serif;">Age : 9 Months</div>
+                            <button class="btn-know-more" onclick="openModal('Marky','img/kucingktk8.gif','Male','9 Months','Marky acts like the rich cool guy of the group. He sits confidently like he owns a luxury car and judges everyone with his classy face. Even though he looks elegant and calm, he secretly enjoys causing tiny chaos and stealing the best sleeping spots.')">Get to know more</button>
+                        </div>
+                        <img src="img/kucingktk8.gif" class="cat-img" alt="Marky">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About -->
+    <div id="about" class="parallax-window" data-parallax="scroll" data-image-src="img/bg4.gif">
+        <div class="container mx-auto tm-container py-24 sm:py-48">
+            <!-- pojok kiri dengan space -->
+            <div style="max-width: 480px; margin-left: 3rem; margin-right: auto; padding: 0 1rem;">
+                <div class="bg-white bg-opacity-80 p-12 pb-14 rounded-xl mb-5">
+                    <h2 class="mb-6 tm-text-green text-4xl font-medium">About Our Cat Adoption</h2>
+                    <p class="mb-6 text-base leading-8" style="font-family:'Nunito',sans-serif;">
+                        Our cat adoption is a place run with love, where every cat gets proper care and attention while waiting for their forever home. We believe every cat deserves a warm and happy family.
+                    </p>
+                    <p class="text-base leading-8" style="font-family:'Nunito',sans-serif;">
+                        If you wish to <a rel="nofollow" href="https://www.instagram.com/kalilanaomii/" target="_parent">support us</a>, please share our page with your friends or follow our Instagram. That would be very helpful. Thank you so much!
+                    </p>
+                </div>
+                <a href="#contact" class="inline-block tm-bg-green transition text-white text-xl pt-3 pb-4 px-8 rounded-md" style="font-family:'Nunito',sans-serif; font-weight:700;">
+                    <i class="far fa-comments mr-4"></i>
+                    Send Message
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact -->
+    <div id="contact" class="parallax-window relative" data-parallax="scroll" data-image-src="img/bg5.gif">
+        <div class="container mx-auto tm-container pt-24 pb-48 sm:py-48">
+            <div class="flex flex-col lg:flex-row justify-around items-center lg:items-stretch">
+
+                <!-- Info kiri -->
+                <div class="flex-1 rounded-xl px-10 py-12 m-5 bg-white bg-opacity-90 tm-item-container">
+                    <h2 class="tm-text-green" style="font-size:2.2rem; font-family:'Cormorant Garamond',serif; margin-bottom: 2rem;">Contact Us</h2>
+
+                    <div class="contact-info-label">Address</div>
+                    <div class="contact-info-value">Jl. C. Simanjuntak 60, Yogyakarta</div>
+
+                    <div class="contact-info-label">Phone</div>
+                    <div class="contact-info-value">
+                        <a href="tel:08888650603">08888650603</a>
+                    </div>
+
+                    <div class="contact-info-label">WhatsApp</div>
+                    <div class="contact-info-value">
+                        <a href="https://wa.me/+628888650603" target="_blank">+62 888-865-0603</a>
+                    </div>
+
+                    <div class="contact-info-label">Instagram</div>
+                    <div class="contact-info-value">
+                        <a href="https://www.instagram.com/kalilanaomii/" target="_blank">@kalilanaomii</a>
+                    </div>
+
+                    <a href="https://goo.gl/maps/dXViG2rdqh7XozfL6" target="_blank" class="btn-maps-big">
+                        <i class="fas fa-map-marked-alt"></i>
+                        Open in Google Maps
+                    </a>
+                </div>
+
+                <!-- Form kanan -->
+                <div class="flex-1 rounded-xl p-12 pb-14 m-5 bg-black bg-opacity-60 tm-item-container">
+                    <h2 style="font-size:2rem; font-family:'Cormorant Garamond',serif; color:#f0c040; margin-bottom:1.5rem;">Send Us a Message</h2>
+
+                    <div class="wa-bubble" id="waBubble"></div>
+
+                    <form id="contactForm">
+                        <label class="contact-label">Your Name</label>
+                        <input type="text" name="name" id="contactName" class="contact-input" placeholder="e.g. Kalila" required />
+
+                        <label class="contact-label">WhatsApp Number</label>
+                        <input type="tel" name="whatsapp" id="contactWa" class="contact-input" placeholder="e.g. 08123456789" required />
+
+                        <label class="contact-label">Message</label>
+                        <textarea rows="5" name="message" id="contactMessage" class="contact-textarea" placeholder="Write your message here..." required></textarea>
+
+                        <div class="text-right">
+                            <button type="submit" class="btn-send">
+                                <i class="fas fa-paper-plane mr-2"></i> Send it
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            <footer class="absolute bottom-0 left-0 w-full">
+                <div class="text-white container mx-auto tm-container p-8 flex flex-col md:flex-row justify-between" style="font-family:'Nunito',sans-serif; font-size:1rem;">
+                    <span>Copyright 2026 Adopt Your Cat!. All rights reserved.</span>
+                    <span class="mt-5 md:mt-0">Design: <a href="https://www.instagram.com/kalilanaomii/" target="_parent" style="color:#f0c040;">Kalilanaomii</a></span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP -->
+    <div class="cat-modal-overlay" id="catModal">
+        <div class="cat-modal-box">
+            <button class="cat-modal-close" onclick="closeModal()">&#10005;</button>
+            <div class="cat-modal-left">
+                <img id="modalImg" src="" class="cat-modal-img" alt="">
+                <button class="btn-ask-cat" onclick="askAboutCat()">
+                    <i class="fas fa-comment-dots mr-2"></i> Ask about this cat
+                </button>
+            </div>
+            <div class="cat-modal-info">
+                <h3 id="modalName"></h3>
+                <p class="cat-detail" id="modalGender"></p>
+                <p class="cat-detail" id="modalAge"></p>
+                <div class="cat-bio" id="modalBio"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/parallax.min.js"></script>
+    <script src="js/jquery.singlePageNav.min.js"></script>
+    <script>
+        var currentCatName = '';
+        var ADMIN_WA = '628888650603';
+
+        function openModal(name, img, gender, age, bio) {
+            currentCatName = name;
+            document.getElementById('modalName').textContent = name;
+            document.getElementById('modalImg').src = img;
+            document.getElementById('modalImg').alt = name;
+            document.getElementById('modalGender').textContent = 'Gender : ' + gender;
+            document.getElementById('modalAge').textContent = 'Age : ' + age;
+            document.getElementById('modalBio').textContent = bio;
+            document.getElementById('catModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('catModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function askAboutCat() {
+            var msg = "Hi! I'm interested in adopting " + currentCatName + ". Can I get more information about this cat?";
+            document.getElementById('contactMessage').value = msg;
+
+            var bubble = document.getElementById('waBubble');
+            bubble.textContent = '💬 "' + msg + '"';
+            bubble.classList.add('visible');
+
+            closeModal();
+            setTimeout(function() {
+                document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+            }, 200);
+        }
+
+        // Submit form → kirim ke WA admin
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var name    = document.getElementById('contactName').value.trim();
+            var wa      = document.getElementById('contactWa').value.trim();
+            var message = document.getElementById('contactMessage').value.trim();
+
+            if (!name || !wa || !message) return;
+
+            var fullMsg = "Halo! Saya *" + name + "* (WA: " + wa + ")\n\n" + message;
+            var encoded = encodeURIComponent(fullMsg);
+            var url     = "https://wa.me/" + ADMIN_WA + "?text=" + encoded;
+
+            window.open(url, '_blank');
+        });
+
+        document.getElementById('catModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function checkAndShowHideMenu() {
+            if (window.innerWidth < 768) {
+                $('#tm-nav ul').addClass('hidden');
+            } else {
+                $('#tm-nav ul').removeClass('hidden');
+            }
+        }
+
+        $(function(){
+            var tmNav = $('#tm-nav');
+            tmNav.singlePageNav();
+            checkAndShowHideMenu();
+            window.addEventListener('resize', checkAndShowHideMenu);
+
+            $('#menu-toggle').click(function(){
+                $('#tm-nav ul').toggleClass('hidden');
+            });
+
+            $('#tm-nav ul li').click(function(){
+                if (window.innerWidth < 768) {
+                    $('#tm-nav ul').addClass('hidden');
+                }
+            });
+
+            $(document).scroll(function() {
+                var d = $(document).scrollTop();
+                if (d > 100) { tmNav.addClass('scroll'); }
+                else { tmNav.removeClass('scroll'); }
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
